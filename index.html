@@ -1,227 +1,300 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎄 Vánoční dárky</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎁 Christmas Gift Dashboard</title>
 
-  <style>
-    :root {
-      --bg: #f3f4f6;
-      --card: #ffffff;
-      --primary: #AE0055;
-      --text: #111827;
-      --muted: #6b7280;
-    }
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    * { box-sizing: border-box; }
+<style>
+:root {
+  --bg: #0f172a;
+  --card: rgba(255,255,255,0.08);
+  --glass: rgba(255,255,255,0.12);
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --accent: #22c55e;
+  --accent2: #38bdf8;
+  --danger: #ef4444;
+}
 
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
+* { box-sizing: border-box; }
 
-    header {
-      background: var(--primary);
-      color: white;
-      padding: 14px 16px;
-      font-size: 18px;
-      font-weight: 600;
-      text-align: center;
-      position: sticky;
-      top: 0;
-    }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial;
+  background: linear-gradient(160deg, #020617, #0f172a);
+  color: var(--text);
+}
 
-    .container {
-      padding: 16px;
-      max-width: 900px;
-      margin: auto;
-    }
+header {
+  padding: 20px;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+}
 
-    .card {
-      background: var(--card);
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 16px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
+.container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 16px;
+}
 
-    label {
-      font-size: 12px;
-      color: var(--muted);
-      display: block;
-      margin-bottom: 4px;
-    }
+.grid {
+  display: grid;
+  gap: 16px;
+}
 
-    input, select {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 12px;
-      border-radius: 8px;
-      border: 1px solid #d1d5db;
-      font-size: 14px;
-    }
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
 
-    button {
-      width: 100%;
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+.card {
+  background: var(--card);
+  backdrop-filter: blur(14px);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
+h2 {
+  margin: 0 0 10px;
+  font-size: 16px;
+  color: var(--muted);
+}
 
-    th, td {
-      padding: 10px 6px;
-      border-bottom: 1px solid #e5e7eb;
-      text-align: left;
-      vertical-align: middle;
-    }
+label {
+  font-size: 12px;
+  color: var(--muted);
+}
 
-    th {
-      font-size: 12px;
-      color: var(--muted);
-    }
+input, select {
+  width: 100%;
+  margin-top: 4px;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: var(--glass);
+  color: var(--text);
+}
 
-    .delete {
-      color: #dc2626;
-      cursor: pointer;
-      font-weight: bold;
-      text-align: center;
-    }
+button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #022c22;
+  font-weight: 700;
+  cursor: pointer;
+}
 
-    .total {
-      font-size: 16px;
-      font-weight: 700;
-      text-align: right;
-      margin-top: 10px;
-    }
-  </style>
+button:hover { opacity: 0.9; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th, td {
+  padding: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+th {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.delete {
+  color: var(--danger);
+  cursor: pointer;
+  text-align: center;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.planned { background: #f59e0b; color:#451a03; }
+.bought { background: #38bdf8; color:#082f49; }
+.wrapped { background: #22c55e; color:#022c22; }
+
+.stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 18px;
+  font-weight: 700;
+}
+</style>
 </head>
 
 <body>
 
-<header>🎄 Tracker vánočních dárků</header>
+<header>🎁 Christmas Gift Dashboard</header>
 
-<div class="container">
+<div class="container grid">
 
-  <!-- Přidání dárku -->
-  <div class="card">
-    <label>Komu</label>
-    <input id="to" placeholder="Např. Máma">
+<!-- FORM -->
+<div class="card">
+  <h2>Přidat dárek</h2>
 
-    <label>Co</label>
-    <input id="what" placeholder="Např. Parfém">
+  <label>Komu</label>
+  <input id="to">
 
-    <label>Cena (Kč)</label>
-    <input id="price" type="number" placeholder="1500">
+  <label>Co</label>
+  <input id="what">
 
-    <label>Status</label>
-    <select id="status">
-      <option value="planned">Plánováno</option>
-      <option value="bought">Koupeno</option>
-      <option value="wrapped">Zabaleno</option>
-    </select>
+  <label>Cena (Kč)</label>
+  <input id="price" type="number">
 
-    <button onclick="addGift()">➕ Přidat dárek</button>
+  <label>Status</label>
+  <select id="status">
+    <option value="planned">Plánováno</option>
+    <option value="bought">Koupeno</option>
+    <option value="wrapped">Zabaleno</option>
+  </select>
+
+  <button onclick="addGift()">➕ Přidat</button>
+</div>
+
+<!-- TABLE -->
+<div class="card">
+  <h2>Přehled</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Komu</th>
+        <th>Co</th>
+        <th>Cena</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="list"></tbody>
+  </table>
+
+  <div class="stats">
+    <div>💰 Celkem</div>
+    <div id="total"></div>
   </div>
+</div>
 
-  <!-- Přehled -->
-  <div class="card">
-    <table>
-      <thead>
-        <tr>
-          <th>Komu</th>
-          <th>Co</th>
-          <th>Cena</th>
-          <th>Status</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="list"></tbody>
-    </table>
+<!-- CHARTS -->
+<div class="card">
+  <h2>Stav dárků</h2>
+  <canvas id="statusChart"></canvas>
+</div>
 
-    <div class="total" id="total"></div>
-  </div>
+<div class="card">
+  <h2>Výdaje</h2>
+  <canvas id="priceChart"></canvas>
+</div>
 
 </div>
 
 <script>
-  let gifts = JSON.parse(localStorage.getItem("gifts") || "[]");
+let gifts = JSON.parse(localStorage.getItem("gifts") || "[]");
 
-  function save() {
-    localStorage.setItem("gifts", JSON.stringify(gifts));
-  }
+let statusChart, priceChart;
 
-  function addGift() {
-    const to = document.getElementById("to").value.trim();
-    const what = document.getElementById("what").value.trim();
-    const price = Number(document.getElementById("price").value);
-    const status = document.getElementById("status").value;
+function save() {
+  localStorage.setItem("gifts", JSON.stringify(gifts));
+}
 
-    if (!to || !what || !price) return;
+function addGift() {
+  const to = toEl.value.trim();
+  const what = whatEl.value.trim();
+  const price = Number(priceEl.value);
+  const status = statusEl.value;
+  if (!to || !what || !price) return;
 
-    gifts.push({ to, what, price, status });
-    save();
-    render();
-
-    document.getElementById("to").value = "";
-    document.getElementById("what").value = "";
-    document.getElementById("price").value = "";
-  }
-
-  function removeGift(index) {
-    gifts.splice(index, 1);
-    save();
-    render();
-  }
-
-  function updateStatus(index, newStatus) {
-    gifts[index].status = newStatus;
-    save();
-  }
-
-  function render() {
-    const list = document.getElementById("list");
-    list.innerHTML = "";
-
-    let sum = 0;
-
-    gifts.forEach((g, i) => {
-      sum += g.price;
-
-      list.innerHTML += `
-        <tr>
-          <td>${g.to}</td>
-          <td>${g.what}</td>
-          <td>${g.price} Kč</td>
-          <td>
-            <select onchange="updateStatus(${i}, this.value)">
-              <option value="planned" ${g.status === "planned" ? "selected" : ""}>Plánováno</option>
-              <option value="bought" ${g.status === "bought" ? "selected" : ""}>Koupeno</option>
-              <option value="wrapped" ${g.status === "wrapped" ? "selected" : ""}>Zabaleno</option>
-            </select>
-          </td>
-          <td class="delete" onclick="removeGift(${i})">✕</td>
-        </tr>
-      `;
-    });
-
-    document.getElementById("total").innerText = "Celkem: " + sum + " Kč";
-  }
-
+  gifts.push({ to, what, price, status });
+  save();
   render();
+}
+
+function removeGift(i) {
+  gifts.splice(i,1);
+  save();
+  render();
+}
+
+function updateStatus(i, v) {
+  gifts[i].status = v;
+  save();
+  render();
+}
+
+function render() {
+  list.innerHTML = "";
+  let sum = 0;
+
+  let planned=0, bought=0, wrapped=0;
+
+  gifts.forEach((g,i)=>{
+    sum += g.price;
+    if(g.status==="planned") planned++;
+    if(g.status==="bought") bought++;
+    if(g.status==="wrapped") wrapped++;
+
+    list.innerHTML += `
+      <tr>
+        <td>${g.to}</td>
+        <td>${g.what}</td>
+        <td>${g.price}</td>
+        <td>
+          <select onchange="updateStatus(${i},this.value)">
+            <option value="planned" ${g.status==="planned"?"selected":""}>Plánováno</option>
+            <option value="bought" ${g.status==="bought"?"selected":""}>Koupeno</option>
+            <option value="wrapped" ${g.status==="wrapped"?"selected":""}>Zabaleno</option>
+          </select>
+        </td>
+        <td class="delete" onclick="removeGift(${i})">✕</td>
+      </tr>`;
+  });
+
+  total.innerText = sum + " Kč";
+  renderCharts(planned,bought,wrapped,sum);
+}
+
+function renderCharts(p,b,w,sum) {
+  if(statusChart) statusChart.destroy();
+  if(priceChart) priceChart.destroy();
+
+  statusChart = new Chart(document.getElementById("statusChart"), {
+    type:"doughnut",
+    data:{
+      labels:["Plánováno","Koupeno","Zabaleno"],
+      datasets:[{data:[p,b,w],backgroundColor:["#f59e0b","#38bdf8","#22c55e"]}]
+    }
+  });
+
+  priceChart = new Chart(document.getElementById("priceChart"), {
+    type:"bar",
+    data:{
+      labels:["Celkem"],
+      datasets:[{data:[sum],backgroundColor:"#22c55e"}]
+    },
+    options:{plugins:{legend:{display:false}}}
+  });
+}
+
+const toEl = document.getElementById("to");
+const whatEl = document.getElementById("what");
+const priceEl = document.getElementById("price");
+const statusEl = document.getElementById("status");
+
+render();
 </script>
 
 </body>
