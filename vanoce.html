@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎄 Tracker vánočních dárků</title>
+
+  <style>
+    :root {
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --primary: #AE0055;
+      --text: #111827;
+      --muted: #6b7280;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 14px 16px;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+      position: sticky;
+      top: 0;
+    }
+
+    .container {
+      padding: 16px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #9ca3af;
+      margin-top: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 10px 6px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+    }
+
+    th {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .status {
+      font-weight: 600;
+    }
+
+    .planned { color: #d97706; }
+    .bought { color: #2563eb; }
+    .wrapped { color: #16a34a; }
+
+    .delete {
+      color: #dc2626;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .total {
+      font-size: 16px;
+      font-weight: 700;
+      text-align: right;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>🎄 Tracker vánočních dárků</header>
+
+<div class="container">
+
+  <div class="card">
+    <label>Komu</label>
+    <input id="to" placeholder="Např. Máma">
+
+    <label>Co</label>
+    <input id="what" placeholder="Např. Parfém">
+
+    <label>Cena (Kč)</label>
+    <input id="price" type="number" placeholder="1500">
+
+    <label>Status</label>
+    <select id="status">
+      <option value="planned">Plánováno</option>
+      <option value="bought">Koupeno</option>
+      <option value="wrapped">Zabaleno</option>
+    </select>
+
+    <button onclick="addGift()">➕ Přidat dárek</button>
+  </div>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Komu</th>
+          <th>Co</th>
+          <th>Cena</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="list"></tbody>
+    </table>
+
+    <div class="total" id="total"></div>
+
+    <button class="secondary" onclick="clearAll()">🗑 Vymazat vše</button>
+  </div>
+
+</div>
+
+<script>
+  let gifts = JSON.parse(localStorage.getItem("gifts") || "[]");
+
+  function save() {
+    localStorage.setItem("gifts", JSON.stringify(gifts));
+  }
+
+  function addGift() {
+    const to = document.getElementById("to").value.trim();
+    const what = document.getElementById("what").value.trim();
+    const price = Number(document.getElementById("price").value);
+    const status = document.getElementById("status").value;
+
+    if (!to || !what || !price) return;
+
+    gifts.push({ to, what, price, status });
+    save();
+    render();
+
+    document.getElementById("to").value = "";
+    document.getElementById("what").value = "";
+    document.getElementById("price").value = "";
+  }
+
+  function removeGift(index) {
+    gifts.splice(index, 1);
+    save();
+    render();
+  }
+
+  function render() {
+    const list = document.getElementById("list");
+    list.innerHTML = "";
+
+    let sum = 0;
+
+    gifts.forEach((g, i) => {
+      sum += g.price;
+
+      list.innerHTML += `
+        <tr>
+          <td>${g.to}</td>
+          <td>${g.what}</td>
+          <td>${g.price} Kč</td>
+          <td class="status ${g.status}">
+            ${g.status === "planned" ? "Plánováno" : g.status === "bought" ? "Koupeno" : "Zabaleno"}
+          </td>
+          <td class="delete" onclick="removeGift(${i})">✕</td>
+        </tr>
+      `;
+    });
+
+    document.getElementById("total").innerText = "Celkem: " + sum + " Kč";
+  }
+
+  function clearAll() {
+    if (!confirm("Opravdu smazat všechny dárky?")) return;
+    gifts = [];
+    save();
+    render();
+  }
+
+  render();
+</script>
+
+</body>
+</html>
